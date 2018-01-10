@@ -1,0 +1,23 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+
+a {
+  color: #00B7FF; }
+
+input {
+  padding: 0.5rem 1rem;
+  border: 2px solid rgba(0, 183, 255, 0.4);
+  border-radius: 0.5rem 2rem 0.5rem;
+  outline: #00B7FF; }
+
+button.upload {
+  margin-left: 1rem;
+  padding: 0.5rem;
+  border: none;
+  background-color: rgba(0, 183, 255, 0.4);
+  color: #fff;
+  outline: #00B7FF;
+  border-radius: 2rem; }
+
+/*# sourceMappingURL=style.css.map */

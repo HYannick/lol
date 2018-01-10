@@ -1,0 +1,17 @@
+## Apostrophe gitignore
+
+node_modules
+## Custom rules
+.tmp
+.idea
+.swp
+.vscode
+.nvmrc
+yarn-error.log
+
+## OS metadata
+.DS_Store
+Thumbs.db
+
+## Ignore local config:
+/config/local.js
