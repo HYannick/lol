@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const sassMiddleware = require('node-sass-middleware');
 const cors = require('cors');
 const app = express();
-const port = process.env.PORT || 4001;
+const port = process.env.PORT || 4000;
 const routes = require('./routes');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -2,7 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
+const cloudinary = require('cloudinary');
 let ioSocket = null;
+cloudinary.config({
+  cloud_name: 'ayho-society',
+  api_key: '387412896244547',
+  api_secret: '4Vvzfyeq1Y7TF8lNeZA8bN7jvwc'
+});
 
 function bytesToSize(bytes) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
@@ -70,15 +76,15 @@ module.exports = {
               fs.stat(audioOutput, (err, stats) => {
                 if (err) throw err;
                 audioFileSizeInBytes = stats.size;
-                const percent = (audioFileSizeInBytes/fileSizeInBytes) * 100;
+                const percent = (audioFileSizeInBytes / fileSizeInBytes) * 100;
                 ioSocket.emit('downloading', percent)
               });
             })
             .on('end', () => {
               ioSocket.emit('downloading', 100)
-              res.download(audioOutput, () => {
-                if (err) {
-                  console.log(err);
+              cloudinary.v2.uploader.upload(audioOutput, {resource_type: "video", use_filename: true, unique_filename: false}, function(err, result) {
+                if(err) {
+                  res.json({error: err})
                 }
                 fs.unlink(mainOutput, err => {
                   if (err) console.error(err);
@@ -88,7 +94,8 @@ module.exports = {
                   if (err) console.error(err);
                   else console.log('\nfinished downloading!');
                 });
-              })
+                res.json({downloadUrl: result.url})
+              });
             })
             .save(audioOutput)
         })
