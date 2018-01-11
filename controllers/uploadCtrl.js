@@ -4,19 +4,16 @@ const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
 const ytSearch = require('youtube-search');
 let ioSocket = null;
-
+const opts = {
+  maxResults: 1,
+  key: 'AIzaSyDPY75GaIBzt5P3p1ULzNehW9TQ4JdHBOI'
+};
 function bytesToSize(bytes) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
   if (bytes === 0) return 'n/a'
   const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
   if (i === 0) return `${bytes} ${sizes[i]})`
   return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
-}
-
-function parseThumbnail(thumbnail) {
-  const maxres_thumbnail = thumbnail.split('/')
-  maxres_thumbnail.pop()
-  return maxres_thumbnail.join('/')
 }
 
 module.exports = {
@@ -28,23 +25,19 @@ module.exports = {
   },
   previewSong(req, res, next) {
     const {url} = req.query;
-    const opts = {
-      maxResults: 1,
-      key: 'AIzaSyDPY75GaIBzt5P3p1ULzNehW9TQ4JdHBOI'
-    };
     ytSearch(url, opts, function (err, results) {
       if (err) return console.log(err);
-      console.log(results[0]);
       res.json({img: results[0].thumbnails.medium.url, title: results[0].title});
     })
   },
   uploadSong(req, res, next) {
     const {url} = req.body;
     console.log('Log :: preview ->', url);
-    ytdl.getInfo(url, (err, info) => {
+    ytSearch(url, opts, function (err, info) {
       if (err) {
         res.json({message: 'Failed to format the video'})
       }
+
       const args = {
         format: 'mp3',
         bitrate: 128,
@@ -52,8 +45,8 @@ module.exports = {
         duration: null
       }
 
-      const mainOutput = path.resolve(__dirname, `${info.title}.mp3`);
-      const audioOutput = path.resolve(__dirname, `audio/${info.title}.mp3`);
+      const mainOutput = path.resolve(__dirname, `${info[0].title}.mp3`);
+      const audioOutput = path.resolve(__dirname, `audio/${info[0].title}.mp3`);
       ytdl(url, {filter: 'audioonly'})
         .pipe(fs.createWriteStream(mainOutput))
         .on('finish', () => {
