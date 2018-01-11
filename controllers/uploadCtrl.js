@@ -73,6 +73,7 @@ module.exports = {
             })
             .on('progress', progress => {
               let audioFileSizeInBytes;
+              console.log(progress)
               fs.stat(audioOutput, (err, stats) => {
                 if (err) throw err;
                 audioFileSizeInBytes = stats.size;
