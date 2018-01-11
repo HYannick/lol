@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
+const ytSearch = require('youtube-search');
 let ioSocket = null;
 
 function bytesToSize(bytes) {
@@ -27,11 +28,14 @@ module.exports = {
   },
   previewSong(req, res, next) {
     const {url} = req.query;
-    ytdl.getInfo(url, (err, info) => {
-      if (err) {
-        res.json({message: 'Failed to load the video'})
-      }
-      res.json({img: `${parseThumbnail(info.thumbnail_url)}/maxresdefault.jpg`, title: info.title});
+    const opts = {
+      maxResults: 1,
+      key: 'AIzaSyDPY75GaIBzt5P3p1ULzNehW9TQ4JdHBOI'
+    };
+    ytSearch(url, opts, function (err, results) {
+      if (err) return console.log(err);
+      console.log(results[0]);
+      res.json({img: results[0].thumbnails.medium.url, title: results[0].title});
     })
   },
   uploadSong(req, res, next) {
