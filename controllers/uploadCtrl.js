@@ -31,67 +31,62 @@ module.exports = {
     })
   },
   uploadSong(req, res, next) {
-    const {url} = req.body;
+    const {url, title, id} = req.body;
+    console.log(title);
     console.log('Log :: preview ->', url);
-    ytSearch(url, opts, function (err, info) {
-      if (err) {
-        res.json({message: 'Failed to format the video'})
-      }
+    const args = {
+      format: 'mp3',
+      bitrate: 128,
+      seek: 0,
+      duration: null
+    }
 
-      const args = {
-        format: 'mp3',
-        bitrate: 128,
-        seek: 0,
-        duration: null
-      }
-
-      const mainOutput = path.resolve(__dirname, `${info[0].title}.mp3`);
-      const audioOutput = path.resolve(__dirname, `audio/${info[0].title}.mp3`);
-      ytdl(url, {filter: 'audioonly'})
-        .pipe(fs.createWriteStream(mainOutput))
-        .on('finish', () => {
-          let fileSizeInBytes
-          fs.stat(mainOutput, (err, stats) => {
-            if (err) throw err;
-            fileSizeInBytes = stats.size;
-          });
-          ffmpeg()
-            .input(ytdl(url, {filter: 'audioonly'}))
-            // .audioBitrate(args.bitrate)
-            .format(args.format)
-            .on('error', err => {
-              res.json({message: 'Failed to format the video'})
+    const mainOutput = path.resolve(__dirname, `${title}.mp3`);
+    const audioOutput = path.resolve(__dirname, `audio/${title}.mp3`);
+    ytdl(url, {filter: 'audioonly'})
+      .pipe(fs.createWriteStream(mainOutput))
+      .on('finish', () => {
+        let fileSizeInBytes
+        fs.stat(mainOutput, (err, stats) => {
+          if (err) throw err;
+          fileSizeInBytes = stats.size;
+        });
+        ffmpeg()
+          .input(ytdl(url, {filter: 'audioonly'}))
+          // .audioBitrate(args.bitrate)
+          .format(args.format)
+          .on('error', err => {
+            res.json({message: 'Failed to format the video'})
+          })
+          .on('progress', progress => {
+            let audioFileSizeInBytes;
+            fs.stat(audioOutput, (err, stats) => {
+              if (err) throw err;
+              audioFileSizeInBytes = stats.size;
+              const percent = (audioFileSizeInBytes/fileSizeInBytes) * 100;
+              console.log('status =>', percent)
+              ioSocket.emit('downloading', {id, status: `${percent}%`})
+            });
+          })
+          .on('end', () => {
+            ioSocket.emit('downloading', 100)
+            res.download(audioOutput, (err) => {
+              if (err) {
+                console.log(err);
+              }
+              setTimeout(() => {
+                fs.unlink(mainOutput, err => {
+                  if (err) console.error(err);
+                  else console.log('File deleted =>', mainOutput);
+                });
+                fs.unlink(audioOutput, err => {
+                  if (err) console.error(err);
+                  else console.log('File deleted =>', audioOutput);
+                });
+              }, 1000);
             })
-            .on('progress', progress => {
-              let audioFileSizeInBytes;
-              console.log(progress)
-              fs.stat(audioOutput, (err, stats) => {
-                if (err) throw err;
-                audioFileSizeInBytes = stats.size;
-                const percent = (audioFileSizeInBytes/fileSizeInBytes) * 100;
-                ioSocket.emit('downloading', {id: info[0].id, status: percent})
-              });
-            })
-            .on('end', () => {
-              ioSocket.emit('downloading', 100)
-              res.download(audioOutput, () => {
-                if (err) {
-                  console.log(err);
-                }
-                setTimeout(() => {
-                  fs.unlink(mainOutput, err => {
-                    if (err) console.error(err);
-                    else console.log('\nfinished downloading!');
-                  });
-                  fs.unlink(audioOutput, err => {
-                    if (err) console.error(err);
-                    else console.log('\nfinished downloading!');
-                  });
-                }, 1000);
-              })
-            })
-            .save(audioOutput)
-        })
-    })
+          })
+          .save(audioOutput)
+      })
   }
 }
