@@ -3,7 +3,7 @@ module.exports = {
   searchSong(req, res, next) {
     const {item} = req.query;
     const opts = {
-      maxResults: 10,
+      maxResults: 8,
       key: 'AIzaSyDPY75GaIBzt5P3p1ULzNehW9TQ4JdHBOI'
     };
     ytSearch(item, opts, function (err, results) {

@@ -81,10 +81,10 @@ module.exports = {
                 fs.unlink(mainOutput, err => {
                   if (err) console.error(err);
                   else console.log('\nfinished downloading!');
-                });
-                fs.unlink(audioOutput, err => {
-                  if (err) console.error(err);
-                  else console.log('\nfinished downloading!');
+                  fs.unlink(audioOutput, err => {
+                    if (err) console.error(err);
+                    else console.log('\nfinished downloading!');
+                  });
                 });
               })
             })
