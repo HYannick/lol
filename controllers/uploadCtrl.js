@@ -69,7 +69,7 @@ module.exports = {
                 if (err) throw err;
                 audioFileSizeInBytes = stats.size;
                 const percent = (audioFileSizeInBytes/fileSizeInBytes) * 100;
-                ioSocket.emit('downloading', percent)
+                ioSocket.emit('downloading', {id: info[0].id, status: percent})
               });
             })
             .on('end', () => {
