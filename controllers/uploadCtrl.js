@@ -78,14 +78,16 @@ module.exports = {
                 if (err) {
                   console.log(err);
                 }
-                fs.unlink(mainOutput, err => {
-                  if (err) console.error(err);
-                  else console.log('\nfinished downloading!');
+                setTimeout(() => {
+                  fs.unlink(mainOutput, err => {
+                    if (err) console.error(err);
+                    else console.log('\nfinished downloading!');
+                  });
                   fs.unlink(audioOutput, err => {
                     if (err) console.error(err);
                     else console.log('\nfinished downloading!');
                   });
-                });
+                }, 1000);
               })
             })
             .save(audioOutput)
