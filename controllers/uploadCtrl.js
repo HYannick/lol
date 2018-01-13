@@ -19,7 +19,7 @@ module.exports = {
     console.log('Log :: preview ->', url);
     const args = {
       format: 'mp3',
-      bitrate: 128,
+      bitrate: 192,
       seek: 0,
       duration: null
     }
@@ -33,6 +33,8 @@ module.exports = {
         ffmpeg()
           .input(ytdl(url, {filter: 'audioonly'}))
           .format(args.format)
+          .audioCodec('libmp3lame')
+          .audioBitrate(args.bitrate)
           .on('error', err => {
             fs.unlink(audioOutput, err => {
               if (err) console.error(err);
