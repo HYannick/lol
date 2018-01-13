@@ -4,6 +4,7 @@ module.exports = {
     const {item} = req.query;
     const opts = {
       maxResults: 8,
+      type: 'video',
       key: 'AIzaSyDPY75GaIBzt5P3p1ULzNehW9TQ4JdHBOI'
     };
     ytSearch(item, opts, function (err, results) {
