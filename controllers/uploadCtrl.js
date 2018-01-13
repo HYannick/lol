@@ -13,6 +13,7 @@ module.exports = {
     })
   },
   uploadSong(req, res, next) {
+    req.setTimeout(0)
     const {url, title, id} = req.body;
     console.log(title);
     console.log('Log :: preview ->', url);
@@ -30,6 +31,10 @@ module.exports = {
         .input(ytdl(url, {filter: 'audioonly'}))
         .format(args.format)
         .on('error', err => {
+          fs.unlink(audioOutput, err => {
+            if (err) console.error(err);
+            else console.log('File deleted =>', audioOutput);
+          });
           res.json({message: 'Failed to format the video'})
         })
         .on('progress', progress => {
