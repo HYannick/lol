@@ -5,7 +5,7 @@ module.exports = (app) => {
   app.get('/api', function(req,res,next) {
     res.json({hello: 'World ymp3'})
   })
-  app.get('/api/preview', uplCtrl.previewSong);
+  app.get('/api/preview', searchCtrl.searchSong);
   app.get('/api/search', searchCtrl.searchSong);
   app.post('/api/upload', uplCtrl.uploadSong);
 }
