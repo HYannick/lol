@@ -36,7 +36,7 @@ module.exports = {
           .on('error', err => {
             fs.unlink(audioOutput, err => {
               if (err) console.error(err);
-              else console.log('File deleted =>', audioOutput);
+              else console.log('Failed. File deleted =>', audioOutput);
               ioSocket.emit('sendFileError', {id, status: 0})
             });
           })
@@ -52,9 +52,9 @@ module.exports = {
               setTimeout(() => {
                 fs.unlink(audioOutput, err => {
                   if (err) console.error(err);
-                  else console.log('File deleted =>', audioOutput);
+                  else console.log('Success. File deleted =>', audioOutput);
                 });
-              }, 1000);
+              }, 2000);
             })
           })
           .save(audioOutput)
