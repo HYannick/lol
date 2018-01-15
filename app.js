@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const sassMiddleware = require('node-sass-middleware');
 const cors = require('cors');
 const app = express();
+const http = require("http");
 const port = process.env.PORT || 4000;
 const routes = require('./routes');
 // view engine setup
@@ -50,6 +51,11 @@ const io = require('socket.io')(app.listen(port, () => {
   console.log('Running on port :: ', port);
 }))
 
+if(process.env.NODE_ENV === 'production') {
+  setInterval(function() {
+    http.get("http://ymp3.herokuapp.com");
+  }, 9000);
+}
 const uplCtrl = require('./controllers/uploadCtrl');
 uplCtrl.initCon(io);
 
