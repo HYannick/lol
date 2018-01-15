@@ -13,7 +13,9 @@ module.exports = {
     })
   },
   uploadSong(req, res, next) {
-    req.setTimeout(0)
+    req.socket.setTimeout(0)
+    res.setHeader('connection', 'close');
+    console.log(res.header)
     const {url, title, id} = req.body;
     console.log(title);
     console.log('Log :: preview ->', url);
@@ -27,9 +29,9 @@ module.exports = {
     const audioOutput = path.resolve(__dirname, `audio/${title}.mp3`);
     ytdl.getInfo(url, (err, info) => {
       if (err) throw err;
-      if (info.length_seconds > 1800) {
-        res.status(500).json({error: 'video too long bud\' :( '})
-      } else {
+      // if (info.length_seconds > 1800) {
+      //   res.status(500).json({error: 'video too long bud\' :( '})
+      // } else {
         ffmpeg()
           .input(ytdl(url, {filter: 'audioonly'}))
           .format(args.format)
@@ -63,7 +65,7 @@ module.exports = {
             })
           })
           .save(audioOutput)
-      }
+      // }
     })
   }
 }
