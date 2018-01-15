@@ -13,9 +13,7 @@ module.exports = {
     })
   },
   uploadSong(req, res, next) {
-    req.socket.setTimeout(0)
-    res.setHeader('connection', 'close');
-    console.log(res.header)
+    req.setTimeout(0)
     const {url, title, id} = req.body;
     console.log(title);
     console.log('Log :: preview ->', url);
@@ -29,11 +27,7 @@ module.exports = {
     const audioOutput = path.resolve(__dirname, `audio/${title}.mp3`);
     ytdl.getInfo(url, (err, info) => {
       if (err) throw err;
-      // if (info.length_seconds > 1800) {
-        // res.status(500).json({error: 'video too long bud\' :( '})
-      // } else {
-        res.json({ processing : 'processing ...'
-        });
+        res.json({ processing : 'processing ...'});
         ffmpeg()
           .input(ytdl(url, {filter: 'audioonly'}))
           .format(args.format)
@@ -43,8 +37,8 @@ module.exports = {
             fs.unlink(audioOutput, err => {
               if (err) console.error(err);
               else console.log('File deleted =>', audioOutput);
+              ioSocket.emit('sendFileError', {id, status: 0})
             });
-            res.json({message: 'Failed to format the video'})
           })
           .on('progress', progress => {
             const currentTime = moment.duration(progress.timemark).asSeconds();
