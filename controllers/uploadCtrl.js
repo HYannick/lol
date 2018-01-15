@@ -30,8 +30,10 @@ module.exports = {
     ytdl.getInfo(url, (err, info) => {
       if (err) throw err;
       // if (info.length_seconds > 1800) {
-      //   res.status(500).json({error: 'video too long bud\' :( '})
+        // res.status(500).json({error: 'video too long bud\' :( '})
       // } else {
+        res.json({ processing : 'processing ...'
+        });
         ffmpeg()
           .input(ytdl(url, {filter: 'audioonly'}))
           .format(args.format)
@@ -51,11 +53,8 @@ module.exports = {
             ioSocket.emit('downloading', {id, status: percent})
           })
           .on('end', () => {
-            ioSocket.emit('downloading', {id, status: 100})
-            res.download(audioOutput, (err) => {
-              if (err) {
-                console.log(err);
-              }
+            fs.readFile(audioOutput, (err, file) => {
+              ioSocket.emit('sendFile', {id, status: 100, blob: file})
               setTimeout(() => {
                 fs.unlink(audioOutput, err => {
                   if (err) console.error(err);
