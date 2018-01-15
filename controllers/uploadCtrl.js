@@ -27,41 +27,41 @@ module.exports = {
     const audioOutput = path.resolve(__dirname, `audio/${title}.mp3`);
     ytdl.getInfo(url, (err, info) => {
       if (err) throw err;
-      // if (info.length_seconds > 1800) {
-      //   res.status(500).json({error: 'video too long bud\' :( '})
-      // } else {
-      res.json({processing: 'processing ...'});
-      ffmpeg()
-        .input(ytdl(url, {filter: 'audioonly'}))
-        .format(args.format)
-        .audioCodec('libmp3lame')
-        .audioBitrate(args.bitrate)
-        .on('error', err => {
-          fs.unlink(audioOutput, err => {
-            if (err) console.error(err);
-            else console.log('Failed. File deleted =>', audioOutput);
-            ioSocket.emit('sendFileError', {id, status: 0})
-          });
-        })
-        .on('progress', progress => {
-          const currentTime = moment.duration(progress.timemark).asSeconds();
-          const percent = (currentTime / info.length_seconds) * 100
-          console.log(`Status => ${percent}%`)
-          ioSocket.emit('downloading', {id, status: percent})
-        })
-        .on('end', () => {
-          fs.readFile(audioOutput, (err, file) => {
-            ioSocket.emit('sendFile', {id, status: 100, blob: file})
-            setTimeout(() => {
-              fs.unlink(audioOutput, err => {
-                if (err) console.error(err);
-                else console.log('Success. File deleted =>', audioOutput);
-              });
-            }, 2000);
+      if (info.length_seconds > 900) {
+        res.status(500).json({error: 'video too long bud\' :( '})
+      } else {
+        res.json({processing: 'processing ...'});
+        ffmpeg()
+          .input(ytdl(url, {filter: 'audioonly'}))
+          .format(args.format)
+          .audioCodec('libmp3lame')
+          .audioBitrate(args.bitrate)
+          .on('error', err => {
+            fs.unlink(audioOutput, err => {
+              if (err) console.error(err);
+              else console.log('Failed. File deleted =>', audioOutput);
+              ioSocket.emit('sendFileError', {id, status: 0})
+            });
           })
-        })
-        .save(audioOutput)
-      // }
+          .on('progress', progress => {
+            const currentTime = moment.duration(progress.timemark).asSeconds();
+            const percent = (currentTime / info.length_seconds) * 100
+            console.log(`Status => ${percent}%`)
+            ioSocket.emit('downloading', {id, status: percent})
+          })
+          .on('end', () => {
+            fs.readFile(audioOutput, (err, file) => {
+              ioSocket.emit('sendFile', {id, status: 100, blob: file})
+              setTimeout(() => {
+                fs.unlink(audioOutput, err => {
+                  if (err) console.error(err);
+                  else console.log('Success. File deleted =>', audioOutput);
+                });
+              }, 2000);
+            })
+          })
+          .save(audioOutput)
+      }
     })
   }
 }
