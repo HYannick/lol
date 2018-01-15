@@ -27,7 +27,10 @@ module.exports = {
     const audioOutput = path.resolve(__dirname, `audio/${title}.mp3`);
     ytdl.getInfo(url, (err, info) => {
       if (err) throw err;
-        res.json({ processing : 'processing ...'});
+      if (info.length_seconds > 1800) {
+        res.status(500).json({error: 'video too long bud\' :( '})
+      } else {
+        res.json({processing: 'processing ...'});
         ffmpeg()
           .input(ytdl(url, {filter: 'audioonly'}))
           .format(args.format)
@@ -58,7 +61,7 @@ module.exports = {
             })
           })
           .save(audioOutput)
-      // }
+      }
     })
   }
 }
