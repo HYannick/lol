@@ -14,7 +14,7 @@ module.exports = {
   },
   uploadSong(req, res, next) {
     req.setTimeout(0)
-    const {url, title, id} = req.body;
+    const {url, title, id, userId} = req.body;
     console.log(title);
     console.log('Log :: preview ->', url);
     const args = {
@@ -40,18 +40,18 @@ module.exports = {
             fs.unlink(audioOutput, err => {
               if (err) console.error(err);
               else console.log('Failed. File deleted =>', audioOutput);
-              ioSocket.emit('sendFileError', {id, status: 0})
+              ioSocket.emit('sendFileError', {id, userId, status: 0})
             });
           })
           .on('progress', progress => {
             const currentTime = moment.duration(progress.timemark).asSeconds();
             const percent = (currentTime / info.length_seconds) * 100
             console.log(`Status => ${percent}%`)
-            ioSocket.emit('downloading', {id, status: percent})
+            ioSocket.emit('downloading', {id, userId, status: percent})
           })
           .on('end', () => {
             fs.readFile(audioOutput, (err, file) => {
-              ioSocket.emit('sendFile', {id, status: 100, blob: file})
+              ioSocket.emit('sendFile', {id, userId, status: 100, blob: file})
               setTimeout(() => {
                 fs.unlink(audioOutput, err => {
                   if (err) console.error(err);
