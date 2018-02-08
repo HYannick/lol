@@ -23,6 +23,6 @@
     "serve-favicon": "~2.4.5",
     "socket.io": "^2.0.4",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.18.7"
+    "ytdl-core": "^0.20.1"
   }
 }
